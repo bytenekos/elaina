@@ -3,6 +3,31 @@ import re
 from discord.ext import commands
 
 
+async def fix_pixiv(message: discord.Message, link: str):
+    link = link.replace("www.", "")
+    link = link.replace("pixiv.net", "phixiv.net")
+
+    await message.reply(f"Here's a better link! {link}", mention_author=False)
+    await message.edit(suppress=True)
+
+
+async def fix_reddit(message: discord.Message, link: str):
+    link = link.replace("www.", "")
+    link = link.replace("reddit.com", "rxddit.com")
+
+    await message.reply(f"Here's a better link! {link}", mention_author=False)
+    await message.edit(suppress=True)
+
+
+async def fix_twitter(message: discord.Message, link: str):
+    link = link.replace("www.", "")
+    link = link.replace("x.com", "twitter.com")
+    link = link.replace("twitter.com", "vxtwitter.com")
+
+    await message.reply(f"Here's a better link! {link}", mention_author=False)
+    await message.edit(suppress=True)
+
+
 class Socialfix(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -20,35 +45,13 @@ class Socialfix(commands.Cog):
         message_content = message.content.strip("<>")
         if twitter_match := self.twitter_pattern.search(message_content):
             link = twitter_match.group(0)
-            await self.fix_twitter(message, link)
+            await fix_twitter(message, link)
         elif pixiv_match := self.pixiv_pattern.search(message_content):
             link = pixiv_match.group(0)
-            await self.fix_pixiv(message, link)
+            await fix_pixiv(message, link)
         elif reddit_match := self.reddit_pattern.search(message.content):
             link = reddit_match.group(0)
-            await self.fix_reddit(message, link)
-
-    async def fix_twitter(self, message: discord.Message, link: str):
-        link = link.replace("www.", "")
-        link = link.replace("x.com", "twitter.com")
-        link = link.replace("twitter.com", "vxtwitter.com")
-
-        await message.reply(f"Here's a better link! {link}", mention_author=False)
-        await message.edit(suppress=True)
-
-    async def fix_pixiv(self, message: discord.Message, link: str):
-        link = link.replace("www.", "")
-        link = link.replace("pixiv.net", "phixiv.net")
-
-        await message.reply(f"Here's a better link! {link}", mention_author=False)
-        await message.edit(suppress=True)
-
-    async def fix_reddit(self, message: discord.Message, link: str):
-        link = link.replace("www.", "")
-        link = link.replace("reddit.com", "rxddit.com")
-
-        await message.reply(f"Here's a better link! {link}", mention_author=False)
-        await message.edit(suppress=True)
+            await fix_reddit(message, link)
 
 
 async def setup(bot):
