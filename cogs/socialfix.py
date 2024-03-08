@@ -9,7 +9,7 @@ class Socialfix(commands.Cog):
 
         self.twitter_pattern = re.compile(r"(https://(www.)?(twitter|x)\.com/[a-zA-Z0-9_]+/status/[0-9]+)")
         self.pixiv_pattern = re.compile(r"(https://(www.)?(pixiv)\.net/en/artworks/[0-9]+)")
-        self.reddit_pattern = re.compile(r"(https://(www.)?(reddit)\.com/r/[a-zA-Z0-9_])")
+        self.reddit_pattern = re.compile(r"(https://(www.)?(reddit)\.com/r/[^/]+/(?:comments|s)/[a-zA-Z0-9]+/?)")
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -19,12 +19,14 @@ class Socialfix(commands.Cog):
     async def on_message(self, message: discord.Message):
         message_content = message.content.strip("<>")
         if twitter_match := self.twitter_pattern.search(message_content):
-            print("Twitter match")
             link = twitter_match.group(0)
             await self.fix_twitter(message, link)
         elif pixiv_match := self.pixiv_pattern.search(message_content):
             link = pixiv_match.group(0)
             await self.fix_pixiv(message, link)
+        elif reddit_match := self.reddit_pattern.search(message.content):
+            link = reddit_match.group(0)
+            await self.fix_reddit(message, link)
 
     async def fix_twitter(self, message: discord.Message, link: str):
         link = link.replace("www.", "")
