@@ -9,6 +9,7 @@ class Socialfix(commands.Cog):
 
         self.twitter_pattern = re.compile(r"(https://(www.)?(twitter|x)\.com/[a-zA-Z0-9_]+/status/[0-9]+)")
         self.pixiv_pattern = re.compile(r"(https://(www.)?(pixiv)\.net/en/artworks/[0-9]+)")
+        self.reddit_pattern = re.compile(r"(https://(www.)?(reddit)\.com/r/[a-zA-Z0-9_])")
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -36,6 +37,13 @@ class Socialfix(commands.Cog):
     async def fix_pixiv(self, message: discord.Message, link: str):
         link = link.replace("www.", "")
         link = link.replace("pixiv.net", "phixiv.net")
+
+        await message.reply(f"Here's a better link! {link}", mention_author=False)
+        await message.edit(suppress=True)
+
+    async def fix_reddit(self, message: discord.Message, link: str):
+        link = link.replace("www.", "")
+        link = link.replace("reddit.com", "rxddit.com")
 
         await message.reply(f"Here's a better link! {link}", mention_author=False)
         await message.edit(suppress=True)
