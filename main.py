@@ -25,7 +25,15 @@ async def on_ready():
     print(f"Logged in as {bot.user}")
 
 
+async def loadCogs():
+    for file in os.listdir('./cogs'):
+        if file.endswith('.py'):
+            loadedCogs.append(file[:-3])
+            await bot.load_extension(f'cogs.{file[:-3]}')
+
+
 async def main():
+    await loadCogs()
     await bot.start(TOKEN)
 
 
