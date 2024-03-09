@@ -1,31 +1,42 @@
 import discord
 import re
+import logging
 from discord.ext import commands
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(filename)s: %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
 async def fix_pixiv(message: discord.Message, link: str):
+    logging.info(f"Found valid pixiv link: {link}")
     link = link.replace("www.", "")
     link = link.replace("pixiv.net", "phixiv.net")
 
     await message.reply(f"Here's a better link! {link}", mention_author=False)
     await message.edit(suppress=True)
+    logging.info(f"Fixed pixiv link!")
 
 
 async def fix_reddit(message: discord.Message, link: str):
+    logging.info(f"Found valid reddit link: {link}")
     link = link.replace("www.", "")
     link = link.replace("reddit.com", "rxddit.com")
 
     await message.reply(f"Here's a better link! {link}", mention_author=False)
     await message.edit(suppress=True)
+    logging.info(f"Fixed reddit link!")
 
 
 async def fix_twitter(message: discord.Message, link: str):
+    logging.info(f"Found valid twitter link: {link}")
     link = link.replace("www.", "")
     link = link.replace("x.com", "twitter.com")
     link = link.replace("twitter.com", "vxtwitter.com")
 
     await message.reply(f"Here's a better link! {link}", mention_author=False)
     await message.edit(suppress=True)
+    logging.info(f"Fixed twitter link!")
 
 
 class Socialfix(commands.Cog):
