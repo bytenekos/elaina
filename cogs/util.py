@@ -58,23 +58,23 @@ class Util(commands.Cog):
         embed.add_field(name='Discord.py Version', value=f'{discord.__version__}', inline=False)
         embed.add_field(name='Bot latency', value=f'{round(self.bot.latency * 1000)}ms', inline=False)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(name='avatar', description='Get a users avatar image')
     async def avatar(self, interaction: discord.Interaction, member: discord.Member):
         avatar = member.display_avatar
-        await interaction.response.send_message(f"Here's your [avatar!]({avatar})")
+        await interaction.response.send_message(f"Here's your [avatar!]({avatar})", ephemeral=True)
 
     @app_commands.command(name='banner', description='Get a users banner image')
     async def banner(self, interaction: discord.Interaction, member: discord.Member):
         user = await self.bot.fetch_user(member.id)
         banner = user.banner.url
-        await interaction.response.send_message(f"Here's your [banner!]({banner})")
+        await interaction.response.send_message(f"Here's your [banner!]({banner})", ephemeral=True)
 
     @banner.error
     async def banner_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
         logger.error(f"An error occurred while fetching the banner: {error}")
-        await interaction.response.send_message(f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)")
+        await interaction.response.send_message(f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)", ephemeral=True)
 
 
 async def setup(bot):
