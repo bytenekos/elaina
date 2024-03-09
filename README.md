@@ -5,8 +5,8 @@ Ashen witch from the anime "Majo no tabitabi", Elaina! <br>
 <br>
 # TODO
 
-- [ ] Add public mod log support
-- [ ] Add kick/ban support with reasoning that sends to said mod log
+- [x] Add public mod log support
+- [x] Add kick/ban support with reasoning that sends to said mod log
 - [x] Support for better embed links (like for twitter, pixiv, etc)
 - [ ] Quick mod actions
-- [ ] Add ability to live reload cogs
+- [x] Add ability to live reload cogs
