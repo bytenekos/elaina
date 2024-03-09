@@ -1,0 +1,65 @@
+import os
+import platform
+import random
+import discord
+import logging
+import psutil
+from discord import app_commands
+from discord.ext import commands, tasks
+from math import floor
+
+logger = logging.getLogger('__name__')
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s:%(levelname)s:%(filename)s: %(message)s',
+                    datefmt='%m/%d/%Y %I:%M:%S %p')
+
+
+class Util(commands.Cog):
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        self.change_status.start()
+        logger.info('Util cog loaded')
+
+    @tasks.loop(seconds=30)
+    async def change_status(self):
+        statusType = random.randint(1, 5)
+        match statusType:
+            case 0:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'some anime'))
+            case 1:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f'the rain outside'))
+            case 2:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'vtubers'))
+            case 3:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'smol crimes'))
+            case 4:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'snow fall down'))
+            case 5:
+                await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name=f'games'))
+
+    @app_commands.command(name='ping', description='Checks the bot latency')
+    async def ping(self, interaction: discord.Interaction):
+        await interaction.response.send_message(f'Pong! Response is at a blazing fast {round(self.bot.latency * 1000)}ms', ephemeral=True)
+
+    @app_commands.command(name='status', description='Status of the bot')
+    async def status(self, interaction: discord.Interaction):
+        process = psutil.Process(os.getpid())
+
+        embed = discord.Embed(
+            title=f'{self.bot.user.name} Status', color=discord.Color.blurple())
+        embed.set_thumbnail(url=self.bot.user.display_avatar)
+        embed.add_field(name='CPU Usage', value=f'{psutil.cpu_percent()}%', inline=False)
+        embed.add_field(name='Server Memory Usage', value=f'{psutil.virtual_memory().percent}%', inline=False)
+        embed.add_field(name='Process Memory Usage', value=f'{floor(process.memory_info().rss/1000/1000)}MB', inline=False)
+        embed.add_field(name='Python Version', value=f'{platform.python_version()}', inline=False)
+        embed.add_field(name='Discord.py Version', value=f'{discord.__version__}', inline=False)
+        embed.add_field(name='Bot latency', value=f'{round(self.bot.latency * 1000)}ms', inline=False)
+
+        await interaction.response.send_message(embed=embed)
+
+
+async def setup(bot):
+    await bot.add_cog(Util(bot), guilds=[discord.Object(id=1116469018019233812)])
