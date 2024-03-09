@@ -60,6 +60,22 @@ class Util(commands.Cog):
 
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name='avatar', description='Get a users avatar image')
+    async def avatar(self, interaction: discord.Interaction, member: discord.Member):
+        avatar = member.display_avatar
+        await interaction.response.send_message(f"Here's your [avatar!]({avatar})")
+
+    @app_commands.command(name='banner', description='Get a users banner image')
+    async def banner(self, interaction: discord.Interaction, member: discord.Member):
+        user = await self.bot.fetch_user(member.id)
+        banner = user.banner.url
+        await interaction.response.send_message(f"Here's your [banner!]({banner})")
+
+    @banner.error
+    async def banner_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        logger.error(f"An error occurred while fetching the banner: {error}")
+        await interaction.response.send_message(f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)")
+
 
 async def setup(bot):
     await bot.add_cog(Util(bot), guilds=[discord.Object(id=1116469018019233812)])
