@@ -3,6 +3,7 @@ import re
 import logging
 from discord.ext import commands
 
+logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(filename)s: %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -49,7 +50,7 @@ class Socialfix(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("Socialfix cog is here!")
+        logger.info(f"Socialfix cog loaded!")
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
