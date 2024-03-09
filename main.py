@@ -84,8 +84,8 @@ async def sync(interaction: discord.Interaction):
 @sync.error
 async def on_sync_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingRole):
-        await interaction.response.send_message(f"You're not allowed to run this command. Sorry!", ephemeral=True)
-        logger.error("Missing permissions when running sync command.")
+        await interaction.response.send_message(f"Sync command failed: {error}", ephemeral=True)
+        logger.error(f"Sync command failed: {error}")
 
 
 @bot.tree.command(name='loaded', description='Checks what cogs are loaded')
@@ -98,8 +98,8 @@ async def loaded(interaction: discord.Interaction):
 @loaded.error
 async def on_sync_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingRole):
-        await interaction.response.send_message(f"You're not allowed to run this command. Sorry!", ephemeral=True)
-        logger.error("Missing permissions when running loaded command.")
+        await interaction.response.send_message(f"Loaded command failed: {error}", ephemeral=True)
+        logger.error(f"Loaded command failed: {error}")
 
 
 @bot.tree.command(name='unload', description='unloads a cog')
@@ -114,8 +114,8 @@ async def unload(interaction: discord.Interaction, cog: str):
 @unload.error
 async def on_sync_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingRole):
-        await interaction.response.send_message(f"You're not allowed to run this command. Sorry!", ephemeral=True)
-        logger.error("Missing permissions when running unload command.")
+        await interaction.response.send_message(f"Unload command failed: {error}", ephemeral=True)
+        logger.error(f"Unload command failed: {error}")
 
 
 @bot.tree.command(name='load', description='Loads a cog')
@@ -132,8 +132,8 @@ async def load(interaction: discord.Interaction, cog: str):
 @load.error
 async def on_sync_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingRole):
-        await interaction.response.send_message(f"You're not allowed to run this command. Sorry!", ephemeral=True)
-        logger.error("Missing permissions when running load command.")
+        await interaction.response.send_message(f"Load command failed: {error}", ephemeral=True)
+        logger.error(f"Load command failed: {error}")
 
 
 @bot.tree.command(name='reload', description='Reloads a cog')
@@ -147,8 +147,8 @@ async def reload(interaction: discord.Interaction, cog: str):
 @reload.error
 async def on_sync_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.MissingRole):
-        await interaction.response.send_message(f"You're not allowed to run this command. Sorry!", ephemeral=True)
-        logger.error("Missing permissions when running reload command.")
+        await interaction.response.send_message(f"Reload command failed: {error}", ephemeral=True)
+        logger.error(f"Reload command failed: {error}")
 
 
 async def loadCogs():
