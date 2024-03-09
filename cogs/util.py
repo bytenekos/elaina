@@ -21,7 +21,7 @@ class Util(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.change_status.start()
-        logger.info('Util cog loaded')
+        logger.info('Util cog loaded!')
 
     @tasks.loop(seconds=30)
     async def change_status(self):
