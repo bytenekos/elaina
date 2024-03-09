@@ -1,3 +1,4 @@
 /.env
 .idea
 cogs/__pycache__
+/logs/
