@@ -14,45 +14,45 @@ def ballchoice():
     ballrandom = random.randint(1, 20)
     match ballrandom:
         case 1:
-            return "It is certain."
+            return "it is certain."
         case 2:
-            return "It is decidedly so."
+            return "it is decidedly so."
         case 3:
-            return "Without a doubt."
+            return "without a doubt."
         case 4:
-            return "Yes definitely."
+            return "yes, definitely."
         case 5:
-            return "You may rely on it."
+            return "you may rely on it."
         case 6:
-            return "As I see it, yes."
+            return "as I see it, yes."
         case 7:
-            return "Most likely."
+            return "most likely."
         case 8:
-            return "Outlook good."
+            return "outlook good."
         case 9:
-            return "Yes."
+            return "yes."
         case 10:
-            return "Signs point to yes."
+            return "signs point to yes."
         case 11:
-            return "Reply hazy, try again."
+            return "reply hazy, try again."
         case 12:
-            return "Ask again later."
+            return "ask again later."
         case 13:
-            return "Better not tell you now."
+            return "I better not tell you now."
         case 14:
-            return "Cannot predict now."
+            return "I cannot predict now."
         case 15:
-            return "Concentrate and ask again."
+            return "concentrate and ask again."
         case 16:
-            return "Don't count on it."
+            return "don't count on it."
         case 17:
-            return "My reply is no."
+            return "no."
         case 18:
-            return "My sources say no."
+            return "my sources say no."
         case 19:
-            return "Outlook not so good."
+            return "outlook not so good."
         case 20:
-            return "Very doubtful"
+            return "very doubtful"
 
 
 class Fun(commands.Cog):
@@ -65,7 +65,14 @@ class Fun(commands.Cog):
 
     @app_commands.command(name="8ball", description="Put all your faith in the 8 ball!")
     async def eightball(self, interaction: discord.Interaction, *, question: str):
-        await interaction.response.send_message(ballchoice())
+        s = question
+        if s.endswith('?'):
+            s = s[:-1]
+        s = s.replace("I", "you")
+        s = s.replace("i", "you")
+        s = s[0].lower() + s[1:]
+        await interaction.response.send_message(f"You ask me, {s}?\n"
+                                                f"Well, my answer is {ballchoice()}")
 
 
 async def setup(bot):
