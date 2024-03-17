@@ -10,6 +10,51 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
+def ballchoice():
+    ballrandom = random.randint(1, 20)
+    match ballrandom:
+        case 1:
+            return "It is certain."
+        case 2:
+            return "It is decidedly so."
+        case 3:
+            return "Without a doubt."
+        case 4:
+            return "Yes definitely."
+        case 5:
+            return "You may rely on it."
+        case 6:
+            return "As I see it, yes."
+        case 7:
+            return "Most likely."
+        case 8:
+            return "Outlook good."
+        case 9:
+            return "Yes."
+        case 10:
+            return "Signs point to yes."
+        case 11:
+            return "Reply hazy, try again."
+        case 12:
+            return "Ask again later."
+        case 13:
+            return "Better not tell you now."
+        case 14:
+            return "Cannot predict now."
+        case 15:
+            return "Concentrate and ask again."
+        case 16:
+            return "Don't count on it."
+        case 17:
+            return "My reply is no."
+        case 18:
+            return "My sources say no."
+        case 19:
+            return "Outlook not so good."
+        case 20:
+            return "Very doubtful"
+
+
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -20,48 +65,7 @@ class Fun(commands.Cog):
 
     @app_commands.command(name="8ball", description="Put all your faith in the 8 ball!")
     async def eightball(self, interaction: discord.Interaction, *, question: str):
-        ballchoice = random.randint(1, 20)
-        match ballchoice:
-            case 1:
-                await interaction.response.send_message("It is certain.", ephemeral=True)
-            case 2:
-                await interaction.response.send_message("It is decidedly so.", ephemeral=True)
-            case 3:
-                await interaction.response.send_message("Without a doubt.", ephemeral=True)
-            case 4:
-                await interaction.response.send_message("Yes definitely.", ephemeral=True)
-            case 5:
-                await interaction.response.send_message("You may rely on it.", ephemeral=True)
-            case 6:
-                await interaction.response.send_message("As I see it, yes.", ephemeral=True)
-            case 7:
-                await interaction.response.send_message("Most likely.", ephemeral=True)
-            case 8:
-                await interaction.response.send_message("Outlook good.", ephemeral=True)
-            case 9:
-                await interaction.response.send_message("Yes.", ephemeral=True)
-            case 10:
-                await interaction.response.send_message("Signs point to yes.", ephemeral=True)
-            case 11:
-                await interaction.response.send_message("Reply hazy, try again.", ephemeral=True)
-            case 12:
-                await interaction.response.send_message("Ask again later.", ephemeral=True)
-            case 13:
-                await interaction.response.send_message("Better not tell you now.", ephemeral=True)
-            case 14:
-                await interaction.response.send_message("Cannot predict now.", ephemeral=True)
-            case 15:
-                await interaction.response.send_message("Concentrate and ask again.", ephemeral=True)
-            case 16:
-                await interaction.response.send_message("Don't count on it.", ephemeral=True)
-            case 17:
-                await interaction.response.send_message("My reply is no.", ephemeral=True)
-            case 18:
-                await interaction.response.send_message("My sources say no.", ephemeral=True)
-            case 19:
-                await interaction.response.send_message("Outlook not so good.", ephemeral=True)
-            case 20:
-                await interaction.response.send_message("Very doubtful.", ephemeral=True)
+        await interaction.response.send_message(ballchoice())
 
 
 async def setup(bot):
