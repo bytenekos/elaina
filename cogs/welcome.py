@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
-class Roles(commands.Cog):
+class Welcome(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -34,4 +34,4 @@ class Roles(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Roles(bot), guilds=[discord.Object(id=1116469018019233812)])
+    await bot.add_cog(Welcome(bot), guilds=[discord.Object(id=1116469018019233812)])
