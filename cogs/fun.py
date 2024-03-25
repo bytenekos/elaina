@@ -12,47 +12,27 @@ logging.basicConfig(level=logging.INFO,
 
 def ballchoice():
     ballrandom = random.randint(1, 20)
-    match ballrandom:
-        case 1:
-            return "it is certain."
-        case 2:
-            return "it is decidedly so."
-        case 3:
-            return "without a doubt."
-        case 4:
-            return "yes, definitely."
-        case 5:
-            return "you may rely on it."
-        case 6:
-            return "as I see it, yes."
-        case 7:
-            return "most likely."
-        case 8:
-            return "outlook good."
-        case 9:
-            return "yes."
-        case 10:
-            return "signs point to yes."
-        case 11:
-            return "reply hazy, try again."
-        case 12:
-            return "ask again later."
-        case 13:
-            return "I better not tell you now."
-        case 14:
-            return "I cannot predict now."
-        case 15:
-            return "concentrate and ask again."
-        case 16:
-            return "don't count on it."
-        case 17:
-            return "no."
-        case 18:
-            return "my sources say no."
-        case 19:
-            return "outlook not so good."
-        case 20:
-            return "very doubtful"
+    randomchoice = ["it is certain.",
+                    "it is decidedly so.",
+                    "without a doubt.",
+                    "yes, definitely.",
+                    "you may rely on it.",
+                    "as I see it, yes.",
+                    "most likely.",
+                    "outlook good.",
+                    "yes.",
+                    "signs point to yes.",
+                    "reply hazy, try again.",
+                    "ask again later.",
+                    "I better not tell you now.",
+                    "I cannot predict now.",
+                    "concentrate and ask again.",
+                    "don't count on it.",
+                    "no.",
+                    "my sources say no.",
+                    "outlook not so good.",
+                    "very doubtful"]
+    return random.choice(randomchoice)
 
 
 class Fun(commands.Cog):
@@ -65,13 +45,7 @@ class Fun(commands.Cog):
 
     @app_commands.command(name="8ball", description="Put all your faith in the 8 ball!")
     async def eightball(self, interaction: discord.Interaction, *, question: str):
-        s = question
-        if s.endswith('?'):
-            s = s[:-1]
-        s = s.replace("I", "you")
-        s = s.replace("i", "you")
-        s = s[0].lower() + s[1:]
-        await interaction.response.send_message(f"You ask me, {s}?\n"
+        await interaction.response.send_message(f"Question: {question}?\n\n"
                                                 f"Well, my answer is {ballchoice()}")
 
 
