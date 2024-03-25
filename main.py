@@ -91,7 +91,8 @@ async def on_sync_error(interaction: discord.Interaction, error: app_commands.Ap
 @bot.tree.command(name='loaded', description='Checks what cogs are loaded')
 @app_commands.checks.has_role(1120840113170157599)
 async def loaded(interaction: discord.Interaction):
-    await interaction.response.send_message(f"{loadedCogs} are loaded!", ephemeral=True)
+    loadedresponse = '\n'.join(loadedCogs)
+    await interaction.response.send_message(f"# Cogs loaded:\n{loadedresponse}", ephemeral=True)
     logger.info(f'Loaded cogs: {loadedCogs}')
 
 
