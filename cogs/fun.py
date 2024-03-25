@@ -45,7 +45,10 @@ class Fun(commands.Cog):
 
     @app_commands.command(name="8ball", description="Put all your faith in the 8 ball!")
     async def eightball(self, interaction: discord.Interaction, *, question: str):
-        await interaction.response.send_message(f"Question: {question}?\n\n"
+        s = question
+        if s.endswith('?'):
+            s = s[:-1]
+        await interaction.response.send_message(f"Question: {s}?\n\n"
                                                 f"Well, my answer is {ballchoice()}")
 
 
