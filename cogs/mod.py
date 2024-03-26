@@ -65,6 +65,19 @@ class Mod(commands.Cog):
             await interaction.response.send_message(f"Kick command failed: {error}", ephemeral=True)
             logger.error(f"Kick command failed: {error}")
 
+    @app_commands.command(name="purge", description="purge command")
+    @app_commands.checks.has_permissions(manage_messages=True)
+    async def purge(self, interaction: discord.Interaction, amount: int):
+        await interaction.response.send_message(f"Deleting {amount} messages!", ephemeral=True)
+        await interaction.channel.purge(limit=amount, bulk=True)
+        await interaction.channel.send("*Messages went poof*", delete_after=1)
+
+    @purge.error
+    async def on_purge_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingPermissions):
+            await interaction.response.send_message(f"Purge command failed: {error}", ephemeral=True)
+            logger.error(f"Purge command failed: {error}")
+
 
 async def setup(bot):
     await bot.add_cog(Mod(bot), guilds=[discord.Object(id=1116469018019233812)])
