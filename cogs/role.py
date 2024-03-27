@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
-class TestButton(discord.ui.View):
 class VerifyButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -30,6 +29,40 @@ class VerifyButton(discord.ui.View):
         await interaction.response.send_message(content="You've been accepted, enjoy the server!", ephemeral=True)
 
 
+class Roles(discord.ui.Select):
+    def __init__(self):
+        options = [
+            discord.SelectOption(label='Twitch',
+                                 value='Twitch',
+                                 description='Notifies you of when I go live on Twitch!'),
+            discord.SelectOption(label='Show Off',
+                                 value='Show Off',
+                                 description='Notifies you when I send something in the "show off" channel!'),
+            discord.SelectOption(label='Server Announcements',
+                                 value='Server Announcements',
+                                 description="Notifies you when there's a server announcement!")
+        ]
+        super().__init__(placeholder='Select your role!', min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        selection = self.values[0]
+
+        match selection:
+            case 'Twitch':
+                await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1179188900745457745))
+            case 'Show Off':
+                await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1222310438939787274))
+            case 'Server Announcements':
+                await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1222310641268953119))
+        await interaction.response.send_message(f'Given role {selection}!', ephemeral=True)
+
+
+class Dropdown(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(Roles())
+
+
 class Role(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
@@ -41,7 +74,6 @@ class Role(commands.Cog):
     @app_commands.command(name="sendverify", description="sends a verification message to a channel")
     @app_commands.checks.has_role(1120840113170157599)
     async def accept(self, interaction: discord.Interaction):
-        await interaction.channel.send(content="Press the button below if you've read and accept the rules!", view=TestButton())
         await interaction.channel.send(content="Press the button below if you've read and accept the rules!",
                                        view=VerifyButton())
         await interaction.response.send_message(content="Sent button!", ephemeral=True)
@@ -52,8 +84,19 @@ class Role(commands.Cog):
             await interaction.response.send_message(f"Verify command failed: {error}", ephemeral=True)
             logger.error(f"Verify command failed: {error}")
 
+    @app_commands.command(name="sendroles", description="sends a role setup message to a channel")
+    @app_commands.checks.has_role(1120840113170157599)
+    async def sendroles(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Sent!", ephemeral=True)
+        await interaction.channel.send(content="Select your roles here!", view=Dropdown())
+
+    @sendroles.error
+    async def on_role_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        if isinstance(error, app_commands.MissingRole):
+            await interaction.response.send_message(f"Roles command failed: {error}", ephemeral=True)
+            logger.error(f"Roles command failed: {error}")
+
 
 async def setup(bot):
-    bot.add_view(TestButton())
     bot.add_view(VerifyButton())
     await bot.add_cog(Role(bot), guilds=[discord.Object(id=1116469018019233812)])
