@@ -42,7 +42,7 @@ class Roles(discord.ui.Select):
                                  value='Server Announcements',
                                  description="Notifies you when there's a server announcement!")
         ]
-        super().__init__(placeholder='Select your role!', min_values=1, max_values=1, options=options)
+        super().__init__(placeholder='Select your role!', min_values=1, max_values=1, options=options, custom_id='rolepicker')
 
     async def callback(self, interaction: discord.Interaction):
         selection = self.values[0]
@@ -59,7 +59,7 @@ class Roles(discord.ui.Select):
 
 class Dropdown(discord.ui.View):
     def __init__(self):
-        super().__init__()
+        super().__init__(timeout=None)
         self.add_item(Roles())
 
 
@@ -99,4 +99,5 @@ class Role(commands.Cog):
 
 async def setup(bot):
     bot.add_view(VerifyButton())
+    bot.add_view(Dropdown())
     await bot.add_cog(Role(bot), guilds=[discord.Object(id=1116469018019233812)])
