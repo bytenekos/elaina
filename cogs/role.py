@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO,
 
 
 class TestButton(discord.ui.View):
+class VerifyButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
 
@@ -41,6 +42,8 @@ class Role(commands.Cog):
     @app_commands.checks.has_role(1120840113170157599)
     async def accept(self, interaction: discord.Interaction):
         await interaction.channel.send(content="Press the button below if you've read and accept the rules!", view=TestButton())
+        await interaction.channel.send(content="Press the button below if you've read and accept the rules!",
+                                       view=VerifyButton())
         await interaction.response.send_message(content="Sent button!", ephemeral=True)
 
     @accept.error
@@ -52,4 +55,5 @@ class Role(commands.Cog):
 
 async def setup(bot):
     bot.add_view(TestButton())
+    bot.add_view(VerifyButton())
     await bot.add_cog(Role(bot), guilds=[discord.Object(id=1116469018019233812)])
