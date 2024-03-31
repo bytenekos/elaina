@@ -2,3 +2,4 @@
 .idea
 cogs/__pycache__
 /logs/
+elaina.db
