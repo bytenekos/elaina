@@ -1,6 +1,7 @@
 import random
 import discord
 import logging
+import aiohttp
 from discord import app_commands
 from discord.ext import commands
 
@@ -50,6 +51,17 @@ class Fun(commands.Cog):
             s = s[:-1]
         await interaction.response.send_message(f"Question: {s}?\n\n"
                                                 f"Well, my answer is {ballchoice()}")
+
+    @app_commands.command(name="xkcd", description="Sends an XKCD comic!")
+    async def xkcd(self, interaction: discord.Interaction, comic: int):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://xkcd.com/{comic}') as resp:
+                if resp.status == 200:
+                    await interaction.response.send_message(f"https://xkcd.com/{comic}/")
+                elif resp.status == 404:
+                    await interaction.response.send_message(f"Comic {comic} not found!", ephemeral=True)
+                else:
+                    await interaction.response.send_message(f"Command failed! Reason: {resp.status}: {resp.reason}", ephemeral=True)
 
 
 async def setup(bot):
