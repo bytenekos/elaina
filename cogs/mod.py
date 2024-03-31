@@ -67,7 +67,7 @@ class Mod(commands.Cog):
 
     @app_commands.command(name="purge", description="purge command")
     @app_commands.checks.has_permissions(manage_messages=True)
-    async def purge(self, interaction: discord.Interaction, amount: int):
+    async def purge(self, interaction: discord.Interaction, amount: int = 100):
         await interaction.response.send_message(f"Deleting {amount} messages!", ephemeral=True)
         await interaction.channel.purge(limit=amount, bulk=True)
         await interaction.channel.send("*Messages went poof*", delete_after=1)
