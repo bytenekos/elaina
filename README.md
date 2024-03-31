@@ -16,6 +16,6 @@ Ashen witch from the anime "Majo no tabitabi", Elaina! <br>
 - [X] Custom roles support for stuff (probably gonna do modals for this)
 - [ ] Add filter for stuff (I'm gonna hate doing regex for this)
 - [ ] Birthday stuff (maybe?)
-- [ ] XKCD sender
+- [X] XKCD sender
 - [ ] Send in a chat when I go live
 - [ ] Download and send in chat audio from a youtube video
