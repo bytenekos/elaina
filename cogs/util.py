@@ -4,9 +4,11 @@ import random
 import discord
 import logging
 import psutil
+import json
 from discord import app_commands
 from discord.ext import commands, tasks
 from math import floor
+from utils.util7tv import get7tvEmoteList
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
@@ -108,6 +110,22 @@ class Util(commands.Cog):
         await interaction.response.send_message(
             f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)",
             ephemeral=True)
+
+    @app_commands.command(name='import7tv', description='Imports emotes from 7tv')
+    async def import7tv(self, interaction: discord.Interaction, emote_set: str):
+        logger.info(f'Attempting to import {emote_set} from 7tv!')
+        emote_set = emote_set.split('/')[-1]
+        data = await get7tvEmoteList(emote_set)
+        if data:
+            for emote in data['emotes']:
+                host_url = emote['data']['host']['url']
+                print("Emote:", emote['name'])
+                print("Host URL:", host_url.split('/')[-1])
+            await interaction.response.send_message(f"Here's your [emotes!]({emote_set})")
+        else:
+            logger.error(f'Could not find any emotes in 7tv!')
+            await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
+                                                    f"Please check if the link you sent is correct and try again.")
 
 
 async def setup(bot):
