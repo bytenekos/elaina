@@ -122,9 +122,15 @@ class Util(commands.Cog):
         data = await get7tvEmoteList(emote_set)
         emotes7tv_animated = []
         emotes7tv_non_animated = []
+        emotes7tvID = []
+        emotes7tv_name = []
         if data:
             for emote in data['emotes']:
                 animated = emote['data']['animated']
+                url_parts = emote['data']['host']['url'].split('/')
+                last_part = url_parts[-1]
+                emotes7tv_name.append(emote['name'])
+                emotes7tvID.append(last_part)
                 if animated:
                     emotes7tv_animated.append(emote['name'])
                 else:
@@ -136,9 +142,11 @@ class Util(commands.Cog):
 
             if len(emotes7tv_animated) < animated_free and len(emotes7tv_non_animated) < non_animated_free:
                 logger.info(f"{animated_free} animated slots and {non_animated_free} non animated slots available for import, continuing...")
+                print(emotes7tvID, len(emotes7tvID))
+                print(emotes7tv_name, len(emotes7tv_name))
                 await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available!', ephemeral=True)
-
-                # await download7tvEmote()
+                for emote_id, emote_name in zip(emotes7tvID, emotes7tv_name):
+                    await download7tvEmote(emote_id, emote_name)
 
             elif len(emotes7tv_animated) > animated_free:
                 logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
