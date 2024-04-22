@@ -114,14 +114,24 @@ class Util(commands.Cog):
     @app_commands.command(name='import7tv', description='Imports emotes from 7tv')
     async def import7tv(self, interaction: discord.Interaction, emote_set: str):
         logger.info(f'Attempting to import {emote_set} from 7tv!')
+        emote_limit = interaction.guild.emoji_limit
+        guild_emotes = interaction.guild.emojis
         emote_set = emote_set.split('/')[-1]
         data = await get7tvEmoteList(emote_set)
+        emotes7tv = []
         if data:
             for emote in data['emotes']:
-                host_url = emote['data']['host']['url']
-                print("Emote:", emote['name'])
-                print("Host URL:", host_url.split('/')[-1])
-            await interaction.response.send_message(f"Here's your [emotes!]({emote_set})")
+                emotes7tv.append([emote['name']])
+
+            free_slots = emote_limit - len(guild_emotes)
+
+            if free_slots > len(emotes7tv):
+                logger.info(f"{free_slots} available for import, continuing...")
+                await interaction.response.send_message(f'You have {free_slots} emote slots available!',)
+            else:
+                logger.error(f"{len(emotes7tv) - emote_limit} more emote slots needed!")
+                await interaction.response.send_message(f"You need to have {len(emotes7tv) - emote_limit} more emote slots available!")
+
         else:
             logger.error(f'Could not find any emotes in 7tv!')
             await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
