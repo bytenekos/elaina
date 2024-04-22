@@ -12,7 +12,6 @@ logging.basicConfig(level=logging.INFO,
 
 
 def ballchoice():
-    ballrandom = random.randint(1, 20)
     randomchoice = ["it is certain.",
                     "it is decidedly so.",
                     "without a doubt.",
