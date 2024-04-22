@@ -10,6 +10,11 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
+async def add_roles(self, interaction: discord.Interaction):
+    await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1179086276935299164))
+    await interaction.response.send_message(content="You've been accepted, enjoy the server!", ephemeral=True)
+
+
 class VerifyButton(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -23,10 +28,14 @@ class VerifyButton(discord.ui.View):
             f"Hi there <@{interaction.user.id}>! Hope you enjoy your stay here.",
             f"Welcome to the server, <@{interaction.user.id}>!",
         ]
+        await add_roles(self, interaction)
         welcomechannel = discord.utils.get(interaction.guild.channels, id=1178850385901932564)
-        await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1179086276935299164))
         await welcomechannel.send(random.choice(responses))
-        await interaction.response.send_message(content="You've been accepted, enjoy the server!", ephemeral=True)
+
+    @discord.ui.button(label="Silent Accept", style=discord.ButtonStyle.grey, custom_id="silent_accept")
+    async def silent_accept(self, interaction: discord.Interaction, Button: discord.ui.Button):
+        logger.info(f'Member accepted: {interaction.user.name}, ID: {interaction.user.id}')
+        await add_roles(self, interaction)
 
 
 class Roles(discord.ui.Select):
