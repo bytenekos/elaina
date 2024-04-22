@@ -5,6 +5,7 @@ import discord
 import logging
 import psutil
 import json
+import aiofiles
 from discord import app_commands
 from discord.ext import commands, tasks
 from math import floor
@@ -127,15 +128,19 @@ class Util(commands.Cog):
 
             if free_slots > len(emotes7tv):
                 logger.info(f"{free_slots} available for import, continuing...")
-                await interaction.response.send_message(f'You have {free_slots} emote slots available!',)
+                await interaction.response.send_message(f'You have {free_slots} emote slots available!', ephemeral=True)
+
+
+
             else:
                 logger.error(f"{len(emotes7tv) - emote_limit} more emote slots needed!")
-                await interaction.response.send_message(f"You need to have {len(emotes7tv) - emote_limit} more emote slots available!")
+                await interaction.response.send_message(f"You need to have {len(emotes7tv) - emote_limit} more emote slots available!", ephemeral=True)
 
+            # print("Emote:", emote['name'])
         else:
             logger.error(f'Could not find any emotes in 7tv!')
             await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
-                                                    f"Please check if the link you sent is correct and try again.")
+                                                    f"Please check if the link you sent is correct and try again.", ephemeral=True)
 
 
 async def setup(bot):
