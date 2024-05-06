@@ -20,6 +20,7 @@ Ashen witch from the anime "Majo no tabitabi", Elaina! <br>
 - [ ] Send in a chat when I go live
 - [ ] Download and send in chat audio from a youtube video
 - [ ] Add ability to import emotes from 7tv to discord server
+- [ ] ADD STICKER ADDITIONS TO DISCORD SERVERS (FUCK DISCORD FOR STILL NOT HAVING THIS ON MOBILE)
 
 
 # TODO
