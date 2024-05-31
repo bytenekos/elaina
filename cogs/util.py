@@ -1,13 +1,18 @@
+import io
 import os
 import platform
 import random
+from io import BytesIO
+
 import discord
 import logging
 import psutil
 import json
 import re
 import aiofiles
-from discord import app_commands
+import aiohttp
+from PIL import Image
+from discord import app_commands, File
 from discord.ext import commands, tasks
 from math import floor
 from utils.util7tv import get7tvEmoteList, download7tvEmote, parseGuildEmotes
@@ -113,6 +118,31 @@ class Util(commands.Cog):
             f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)",
             ephemeral=True)
 
+    @app_commands.command(name='addsticker', description='Add a sticker')
+    async def addsticker(self, interaction: discord.Interaction, stickername: str, relatedemoji: str, stickerimg: discord.Attachment, description: str = None):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(stickerimg.url) as resp:
+                bytesSticker = BytesIO(await resp.read())
+                sticker = discord.File(bytesSticker)
+
+                await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=sticker)
+                print("sticker added (yay?)")
+
+        #async with aiohttp.ClientSession() as session:
+        #    async with session.get(stickerimg.url) as resp:
+        #        async with aiofiles.open(folder_path, 'wb') as f:
+        #            await f.write(await resp.read())
+        #            print('downloaded sticker')
+
+        await interaction.response.send_message('hi')
+
+
+        #file_path = '/temp/'
+
+
+        #await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=stickerimg)
+
+
     @app_commands.command(name='import7tv', description='Imports emotes from 7tv')
     async def import7tv(self, interaction: discord.Interaction, emote_set: str):
         logger.info(f'Attempting to import {emote_set} from 7tv!')
@@ -146,7 +176,15 @@ class Util(commands.Cog):
                 print(emotes7tv_name, len(emotes7tv_name))
                 await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available!', ephemeral=True)
                 for emote_id, emote_name in zip(emotes7tvID, emotes7tv_name):
-                    await download7tvEmote(emote_id, emote_name)
+                    emote_bytes = await download7tvEmote(emote_id, emote_name)
+                    if emote_bytes:
+                        file_extension = ".jpg" if emote_bytes.startswith(b'\xff\xd8\xff') else ".gif"
+                        file_name = f"{emote_name}{file_extension}"
+
+                        file = discord.File(io.BytesIO(emote_bytes), filename=file_name)
+                        print(f"Sending: {file_name}")
+
+                        await interaction.channel.send(file=file)
 
             elif len(emotes7tv_animated) > animated_free:
                 logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
