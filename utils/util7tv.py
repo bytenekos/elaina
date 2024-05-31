@@ -3,6 +3,8 @@ import aiofiles
 import asyncio
 import re
 import os
+import io
+from PIL import Image
 
 
 async def get7tvEmoteList(link: str):
@@ -32,17 +34,21 @@ async def parseGuildEmotes(guildEmotes: f""):
 
 async def download7tvEmote(emoteid: str, emotename: str):
     url = f"https://cdn.7tv.app/emote/{emoteid}/4x.webp"
-    file_name = f"{emotename}.webp"
-    folder_path = "temp"
-
-    os.makedirs(folder_path, exist_ok=True)
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             if resp.status == 200:
-                file_path = os.path.join(folder_path, file_name)
-                async with aiofiles.open(file_path, mode="wb") as f:
-                    await f.write(await resp.read())
-                    print(f"Downloaded {url} to {file_path}")
+                emote_data = await resp.read()
+
+                image = Image.open(io.BytesIO(emote_data))
+                image_format = "JPEG" if len(image.split()) == 1 else "GIF"
+
+                with io.BytesIO() as output:
+                    image.save(output, format=image_format)
+                    output.seek(0)
+                    emote_bytes = output.read()
+
+                return emote_bytes
+
             else:
                 print(f"Failed to download {url}, status code: {resp.status}")
