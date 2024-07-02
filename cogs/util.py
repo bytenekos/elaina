@@ -10,7 +10,6 @@ import aiofiles
 from discord import app_commands
 from discord.ext import commands, tasks
 from math import floor
-from utils.util7tv import get7tvEmoteList, download7tvEmote, parseGuildEmotes
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
@@ -112,57 +111,6 @@ class Util(commands.Cog):
         await interaction.response.send_message(
             f"This command failed! Try making sure you have a banner (you need regular nitro for this, not basic)",
             ephemeral=True)
-
-    @app_commands.command(name='import7tv', description='Imports emotes from 7tv')
-    async def import7tv(self, interaction: discord.Interaction, emote_set: str):
-        logger.info(f'Attempting to import {emote_set} from 7tv!')
-        emote_limit = interaction.guild.emoji_limit
-        guild_emotes = interaction.guild.emojis
-        emote_set = emote_set.split('/')[-1]
-        data = await get7tvEmoteList(emote_set)
-        emotes7tv_animated = []
-        emotes7tv_non_animated = []
-        emotes7tvID = []
-        emotes7tv_name = []
-        if data:
-            for emote in data['emotes']:
-                animated = emote['data']['animated']
-                url_parts = emote['data']['host']['url'].split('/')
-                last_part = url_parts[-1]
-                emotes7tv_name.append(emote['name'])
-                emotes7tvID.append(last_part)
-                if animated:
-                    emotes7tv_animated.append(emote['name'])
-                else:
-                    emotes7tv_non_animated.append(emote['name'])
-            guild_parse = f"{guild_emotes}"
-            animated_emotes, non_animated_emotes = await parseGuildEmotes(guild_parse)
-            animated_free = emote_limit - animated_emotes
-            non_animated_free = emote_limit - non_animated_emotes
-
-            if len(emotes7tv_animated) < animated_free and len(emotes7tv_non_animated) < non_animated_free:
-                logger.info(f"{animated_free} animated slots and {non_animated_free} non animated slots available for import, continuing...")
-                print(emotes7tvID, len(emotes7tvID))
-                print(emotes7tv_name, len(emotes7tv_name))
-                await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available!', ephemeral=True)
-                for emote_id, emote_name in zip(emotes7tvID, emotes7tv_name):
-                    await download7tvEmote(emote_id, emote_name)
-
-            elif len(emotes7tv_animated) > animated_free:
-                logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
-                await interaction.response.send_message(
-                    f"You need to have {len(emotes7tv_animated) - animated_free} more animated emote slots available!", ephemeral=True)
-
-            elif len(emotes7tv_non_animated) > non_animated_free:
-                logger.error(f"{len(emotes7tv_non_animated) - non_animated_free} more emote slots needed!")
-                await interaction.response.send_message(
-                    f"You need to have {len(emotes7tv_non_animated) - non_animated_free} more non animated emote slots available!", ephemeral=True)
-
-        else:
-            logger.error(f'Could not find any emotes in 7tv!')
-            await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
-                                                    f"Please check if the link you sent is correct and try again.",
-                                                    ephemeral=True)
 
 
 async def setup(bot):
