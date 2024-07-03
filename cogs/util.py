@@ -3,12 +3,11 @@ import os
 import platform
 import random
 from io import BytesIO
-
+import re
 import discord
 import logging
 import psutil
 import json
-import re
 import aiofiles
 import aiohttp
 from PIL import Image
@@ -125,21 +124,9 @@ class Util(commands.Cog):
                 sticker = discord.File(bytesSticker)
 
                 await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=sticker)
-                print("sticker added (yay?)")
+                logger.info(f"Added {stickername} as a sticker")
 
-        #async with aiohttp.ClientSession() as session:
-        #    async with session.get(stickerimg.url) as resp:
-        #        async with aiofiles.open(folder_path, 'wb') as f:
-        #            await f.write(await resp.read())
-        #            print('downloaded sticker')
-
-        await interaction.response.send_message('hi')
-
-
-        #file_path = '/temp/'
-
-
-        #await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=stickerimg)
+        await interaction.response.send_message('Added successfully!', ephemeral=True)
 
 
 async def setup(bot):
