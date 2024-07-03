@@ -117,16 +117,15 @@ class Util(commands.Cog):
             ephemeral=True)
 
     @app_commands.command(name='addsticker', description='Add a sticker')
-    async def addsticker(self, interaction: discord.Interaction, stickername: str, relatedemoji: str, stickerimg: discord.Attachment, description: str = None):
+    async def addsticker(self, interaction: discord.Interaction, stickername: str, relatedemoji: str, stickerimg: discord.Attachment, description: str = ""):
         async with aiohttp.ClientSession() as session:
             async with session.get(stickerimg.url) as resp:
                 bytesSticker = BytesIO(await resp.read())
-                sticker = discord.File(bytesSticker)
+                sticker = discord.File(bytesSticker, filename='stickers.png')
 
                 await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=sticker)
                 logger.info(f"Added {stickername} as a sticker")
-
-        await interaction.response.send_message('Added successfully!', ephemeral=True)
+                await interaction.response.send_message('Added successfully!', ephemeral=True)
 
 
 async def setup(bot):
