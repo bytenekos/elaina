@@ -65,6 +65,24 @@ bot = commands.Bot(command_prefix='!',
                    guilds=[discord.Object(id=1116469018019233812)])
 
 
+def role_required(role_name: str):
+    async def predicate(interaction: discord.Interaction) -> bool:
+        logger.info(f'Checking role for user {interaction.user}')
+        if not interaction.guild:
+            logger.warning('No guild found in interaction.')
+            return False
+
+        role = discord.utils.get(interaction.guild.roles, name=role_name)
+        if role in interaction.user.roles:
+            logger.info(f'User {interaction.user} has the required role: {role_name}')
+            return True
+        await interaction.response.send_message("You do not have the required role to use this command.", ephemeral=True)
+        logger.warning(f'User {interaction.user} does not have the required role: {role_name}')
+        return False
+
+    return app_commands.check(predicate)
+
+
 @bot.event
 async def on_ready():
     bot.tree.copy_global_to(guild=MY_GUILD)
@@ -74,7 +92,8 @@ async def on_ready():
 
 
 @bot.tree.command(name='sync', description='syncs commands from cogs')
-@app_commands.checks.has_role(1120840113170157599)
+@role_required("RAT")
+@app_commands.default_permissions(administrator=True)
 async def sync(interaction: discord.Interaction):
     fmt = await bot.tree.sync(guild=MY_GUILD)
     await interaction.response.send_message(f"Refreshed {len(fmt)} commands.", ephemeral=True)
@@ -89,7 +108,8 @@ async def on_sync_error(interaction: discord.Interaction, error: app_commands.Ap
 
 
 @bot.tree.command(name='loaded', description='Checks what cogs are loaded')
-@app_commands.checks.has_role(1120840113170157599)
+@role_required("RAT")
+@app_commands.default_permissions(administrator=True)
 async def loaded(interaction: discord.Interaction):
     loadedresponse = '\n'.join(loadedCogs)
     await interaction.response.send_message(f"# Cogs loaded:\n{loadedresponse}", ephemeral=True)
@@ -104,7 +124,8 @@ async def on_sync_error(interaction: discord.Interaction, error: app_commands.Ap
 
 
 @bot.tree.command(name='unload', description='unloads a cog')
-@app_commands.checks.has_role(1120840113170157599)
+@role_required("RAT")
+@app_commands.default_permissions(administrator=True)
 async def unload(interaction: discord.Interaction, cog: str):
     await bot.unload_extension(f"cogs.{cog}")
     loadedCogs.remove(cog)
@@ -120,7 +141,8 @@ async def on_sync_error(interaction: discord.Interaction, error: app_commands.Ap
 
 
 @bot.tree.command(name='load', description='Loads a cog')
-@app_commands.checks.has_role(1120840113170157599)
+@role_required("RAT")
+@app_commands.default_permissions(administrator=True)
 async def load(interaction: discord.Interaction, cog: str):
     for file in os.listdir('./cogs'):
         if file.startswith(cog):
@@ -138,7 +160,8 @@ async def on_sync_error(interaction: discord.Interaction, error: app_commands.Ap
 
 
 @bot.tree.command(name='reload', description='Reloads a cog')
-@app_commands.checks.has_role(1120840113170157599)
+@role_required("RAT")
+@app_commands.default_permissions(administrator=True)
 async def reload(interaction: discord.Interaction, cog: str):
     await bot.reload_extension(f"cogs.{cog}")
     await interaction.response.send_message(f"Reloaded {cog}!", ephemeral=True)

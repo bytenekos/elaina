@@ -10,6 +10,24 @@ logging.basicConfig(level=logging.INFO,
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
+def role_required(role_name: str):
+    async def predicate(interaction: discord.Interaction) -> bool:
+        logger.info(f'Checking role for user {interaction.user}')
+        if not interaction.guild:
+            logger.warning('No guild found in interaction.')
+            return False
+
+        role = discord.utils.get(interaction.guild.roles, name=role_name)
+        if role in interaction.user.roles:
+            logger.info(f'User {interaction.user} has the required role: {role_name}')
+            return True
+        await interaction.response.send_message("You do not have the required role to use this command.", ephemeral=True)
+        logger.warning(f'User {interaction.user} does not have the required role: {role_name}')
+        return False
+
+    return app_commands.check(predicate)
+
+
 async def add_roles(self, interaction: discord.Interaction):
     await interaction.user.add_roles(discord.utils.get(interaction.guild.roles, id=1179086276935299164))
     await interaction.response.send_message(content="You've been accepted, enjoy the server!", ephemeral=True)
@@ -51,7 +69,8 @@ class Roles(discord.ui.Select):
                                  value='Server Announcements',
                                  description="Notifies you when there's a server announcement!")
         ]
-        super().__init__(placeholder='Select your role!', min_values=1, max_values=1, options=options, custom_id='rolepicker')
+        super().__init__(placeholder='Select your role!', min_values=1, max_values=1, options=options,
+                         custom_id='rolepicker')
 
     async def callback(self, interaction: discord.Interaction):
         selection = self.values[0]
@@ -81,7 +100,8 @@ class Role(commands.Cog):
         logger.info(f'Roles cog loaded!')
 
     @app_commands.command(name="sendverify", description="sends a verification message to a channel")
-    @app_commands.checks.has_role(1120840113170157599)
+    @role_required("RAT")
+    @app_commands.default_permissions(administrator=True)
     async def accept(self, interaction: discord.Interaction):
         await interaction.channel.send(content="Press the button below if you've read and accept the rules!",
                                        view=VerifyButton())
@@ -94,7 +114,8 @@ class Role(commands.Cog):
             logger.error(f"Verify command failed: {error}")
 
     @app_commands.command(name="sendroles", description="sends a role setup message to a channel")
-    @app_commands.checks.has_role(1120840113170157599)
+    @role_required("RAT")
+    @app_commands.default_permissions(administrator=True)
     async def sendroles(self, interaction: discord.Interaction):
         await interaction.response.send_message("Sent!", ephemeral=True)
         await interaction.channel.send(content="Select your roles here!", view=Dropdown())
