@@ -1,7 +1,8 @@
 import discord
 import logging
-from discord import app_commands
+from discord import app_commands, Interaction
 from discord.ext import commands
+from utils.roleChecks import role_required
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
@@ -17,8 +18,9 @@ class Mod(commands.Cog):
     async def on_ready(self):
         logger.info(f"Mod cog loaded!")
 
-    @app_commands.command(name="ban", description="Ban command")
-    @app_commands.checks.has_permissions(ban_members=True)
+    @app_commands.command(name="ban", description="Bans a user")
+    @role_required("Mods")
+    @app_commands.default_permissions(ban_members=True)
     async def ban(self, interaction: discord.Interaction, member: discord.Member, reason: str = "None given"):
         await member.ban(reason=reason)
         embed = discord.Embed(
@@ -41,8 +43,9 @@ class Mod(commands.Cog):
             await interaction.response.send_message(f"Ban command failed: {error}", ephemeral=True)
             logger.warning(f"Ban command failed: {error}")
 
-    @app_commands.command(name="kick", description="Kick command")
-    @app_commands.checks.has_permissions(kick_members=True)
+    @app_commands.command(name="kick", description="Kicks a user")
+    @role_required("Mods")
+    @app_commands.default_permissions(kick_members=True)
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: str = "None given"):
         await member.kick(reason=reason)
         embed = discord.Embed(
@@ -66,7 +69,8 @@ class Mod(commands.Cog):
             logger.error(f"Kick command failed: {error}")
 
     @app_commands.command(name="purge", description="purge command")
-    @app_commands.checks.has_permissions(manage_messages=True)
+    @role_required("Mods")
+    @app_commands.default_permissions(manage_messages=True)
     async def purge(self, interaction: discord.Interaction, amount: int = 100):
         await interaction.response.send_message(f"Deleting {amount} messages!", ephemeral=True)
         await interaction.channel.purge(limit=amount, bulk=True)
