@@ -14,6 +14,7 @@ from PIL import Image
 from discord import app_commands, File
 from discord.ext import commands, tasks
 from math import floor
+from utils.roleChecks import role_required
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
@@ -117,12 +118,24 @@ class Util(commands.Cog):
             ephemeral=True)
 
     @app_commands.command(name='addsticker', description='Add a sticker')
+    @role_required("Mods")
+    @app_commands.default_permissions(manage_expressions=True, create_expressions=True)
     async def addsticker(self, interaction: discord.Interaction, stickername: str, relatedemoji: str, stickerimg: discord.Attachment, description: str = ""):
+
+        await interaction.response.defer(ephemeral=True, thinking=True)
+
         sticker = await stickerimg.to_file()
 
         await interaction.guild.create_sticker(name=stickername, description=description, emoji=relatedemoji, file=sticker)
         logger.info(f"Added {stickerimg} as a sticker")
-        await interaction.response.send_message('Added successfully!', ephemeral=True)
+        await interaction.followup.send('Added successfully!', ephemeral=True)
+
+    @addsticker.error
+    async def addsticker_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+        logger.error(f"An error occurred while adding a sticker: {error}")
+        await interaction.followup.send(
+            f"Failed adding sticker! Make sure you have the image file in a proper format (png/gif preferred) \n"
+            f"Full error: {error}", ephemeral=True)
 
 
 async def setup(bot):
