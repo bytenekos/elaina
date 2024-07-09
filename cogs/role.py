@@ -3,29 +3,12 @@ import logging
 import random
 from discord import app_commands
 from discord.ext import commands
+from utils.roleChecks import role_required
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(filename)s: %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
-
-
-def role_required(role_name: str):
-    async def predicate(interaction: discord.Interaction) -> bool:
-        logger.info(f'Checking role for user {interaction.user}')
-        if not interaction.guild:
-            logger.warning('No guild found in interaction.')
-            return False
-
-        role = discord.utils.get(interaction.guild.roles, name=role_name)
-        if role in interaction.user.roles:
-            logger.info(f'User {interaction.user} has the required role: {role_name}')
-            return True
-        await interaction.response.send_message("You do not have the required role to use this command.", ephemeral=True)
-        logger.warning(f'User {interaction.user} does not have the required role: {role_name}')
-        return False
-
-    return app_commands.check(predicate)
 
 
 async def add_roles(self, interaction: discord.Interaction):
