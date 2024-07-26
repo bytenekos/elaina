@@ -11,6 +11,7 @@ from discord import app_commands
 from discord.ext import commands, tasks
 from math import floor
 from utils.util7tv import get7tvEmoteList, download7tvEmote, parseGuildEmotes
+from utils.roleChecks import role_required
 
 logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
@@ -114,6 +115,8 @@ class Util(commands.Cog):
             ephemeral=True)
 
     @app_commands.command(name='import7tv', description='Imports emotes from 7tv')
+    @role_required("Mods")
+    @app_commands.default_permissions(ban_members=True)
     async def import7tv(self, interaction: discord.Interaction, emote_set: str):
         logger.info(f'Attempting to import {emote_set} from 7tv!')
         emote_limit = interaction.guild.emoji_limit
@@ -131,6 +134,7 @@ class Util(commands.Cog):
                 last_part = url_parts[-1]
                 emotes7tv_name.append(emote['name'])
                 emotes7tvID.append(last_part)
+                print(animated)
                 if animated:
                     emotes7tv_animated.append(emote['name'])
                 else:
