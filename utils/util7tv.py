@@ -5,6 +5,7 @@ import re
 import os
 import io
 from PIL import Image
+import pygifsicle as optimize
 
 
 async def get7tvEmoteList(link: str):
@@ -70,3 +71,30 @@ async def download7tvEmoteAnimated(emoteid: str, emotename: str):
 
             else:
                 print(f"Failed to download {url}, status code: {resp.status}")
+
+
+async def compress7tvEmote(emote: bytes, emotename: str):
+    emote_file = io.BytesIO(emote)
+    compressed_file = io.BytesIO()
+
+    # print(1000 / Image.open(emote_file).info['duration'])
+
+    with Image.open(emote_file) as img:
+        frames = []
+        for frame in range(0, img.n_frames):
+            img.seek(frame)
+            frame_img = img.copy()
+            frame_img = frame_img.resize(
+                (int(frame_img.width * 0.5), int(frame_img.height * 0.5)))
+            frames.append(frame_img)
+
+        frames[0].save(
+            compressed_file,
+            format='GIF',
+            save_all=True,
+            append_images=frames[1:],
+            quality=20
+        )
+        compressed_file.seek(0)
+
+        return compressed_file
