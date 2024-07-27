@@ -97,4 +97,4 @@ async def compress7tvEmote(emote: bytes, emotename: str):
         )
         compressed_file.seek(0)
 
-        return compressed_file
+        return compressed_file.read()

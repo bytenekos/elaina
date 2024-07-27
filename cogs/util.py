@@ -173,7 +173,7 @@ class Util(commands.Cog):
 
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
-                        if emote_compressed > 250000:
+                        if sys.getsizeof(emote_compressed) > 250000:
                             print('too big')
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
@@ -195,7 +195,7 @@ class Util(commands.Cog):
                     # print(downloaded)
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
-                        if emote_compressed > 250000:
+                        if sys.getsizeof(emote_compressed) > 250000:
                             print('too big')
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
