@@ -32,19 +32,37 @@ async def parseGuildEmotes(guildEmotes: f""):
     return len(animated_emotes), len(non_animated_emotes)
 
 
-async def download7tvEmote(emoteid: str, emotename: str):
-    url = f"https://cdn.7tv.app/emote/{emoteid}/4x.webp"
+async def download7tvEmoteNonAnimated(emoteid: str, emotename: str):
+    url = f"https://cdn.7tv.app/emote/{emoteid}/4x.png"
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             if resp.status == 200:
                 emote_data = await resp.read()
 
-                image = Image.open(io.BytesIO(emote_data))
-                image_format = "JPEG" if len(image.split()) == 1 else "GIF"
+                # imagesaved = Image.open(io.BytesIO(emote_data))
 
-                with io.BytesIO() as output:
-                    image.save(output, format=image_format)
+                with io.BytesIO(emote_data) as output:
+                    output.seek(0)
+                    emote_bytes = output.read()
+
+                return emote_bytes
+
+            else:
+                print(f"Failed to download {url}, status code: {resp.status}")
+
+
+async def download7tvEmoteAnimated(emoteid: str, emotename: str):
+    url = f"https://cdn.7tv.app/emote/{emoteid}/4x.gif"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                emote_data = await resp.read()
+
+                # imagesaved = Image.open(io.BytesIO(emote_data))
+
+                with io.BytesIO(emote_data) as output:
                     output.seek(0)
                     emote_bytes = output.read()
 

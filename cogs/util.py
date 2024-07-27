@@ -10,7 +10,7 @@ import aiofiles
 from discord import app_commands
 from discord.ext import commands, tasks
 from math import floor
-from utils.util7tv import get7tvEmoteList, download7tvEmote, parseGuildEmotes
+from utils.util7tv import get7tvEmoteList, download7tvEmoteAnimated, download7tvEmoteNonAnimated, parseGuildEmotes
 from utils.roleChecks import role_required
 
 logger = logging.getLogger('__name__')
@@ -127,18 +127,32 @@ class Util(commands.Cog):
         emotes7tv_non_animated = []
         emotes7tvID = []
         emotes7tv_name = []
+
+        animatedID = []
+        non_animatedID = []
         if data:
             for emote in data['emotes']:
+                if emote['data']['animated']:
+                    animatedID.append(emote['id'])
+                else:
+                    non_animatedID.append(emote['id'])
+
                 animated = emote['data']['animated']
                 url_parts = emote['data']['host']['url'].split('/')
                 last_part = url_parts[-1]
                 emotes7tv_name.append(emote['name'])
                 emotes7tvID.append(last_part)
-                print(animated)
+                # print(animated)
                 if animated:
                     emotes7tv_animated.append(emote['name'])
                 else:
                     emotes7tv_non_animated.append(emote['name'])
+
+            print(emotes7tv_animated)
+            print(emotes7tv_non_animated)
+            print(animatedID)
+            print(non_animatedID)
+
             guild_parse = f"{guild_emotes}"
             animated_emotes, non_animated_emotes = await parseGuildEmotes(guild_parse)
             animated_free = emote_limit - animated_emotes
@@ -148,9 +162,15 @@ class Util(commands.Cog):
                 logger.info(f"{animated_free} animated slots and {non_animated_free} non animated slots available for import, continuing...")
                 print(emotes7tvID, len(emotes7tvID))
                 print(emotes7tv_name, len(emotes7tv_name))
+                print(len(animatedID), len(non_animatedID))
                 await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available!', ephemeral=True)
-                for emote_id, emote_name in zip(emotes7tvID, emotes7tv_name):
-                    await download7tvEmote(emote_id, emote_name)
+                for emote_id, emote_name in zip(non_animatedID, emotes7tv_non_animated):
+                    downloaded = await download7tvEmoteNonAnimated(emote_id, emote_name)
+                    await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
+
+                for emote_id, emote_name in zip(animatedID, emotes7tv_animated):
+                    downloaded = await download7tvEmoteAnimated(emote_id, emote_name)
+                    await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
 
             elif len(emotes7tv_animated) > animated_free:
                 logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
@@ -162,11 +182,11 @@ class Util(commands.Cog):
                 await interaction.response.send_message(
                     f"You need to have {len(emotes7tv_non_animated) - non_animated_free} more non animated emote slots available!", ephemeral=True)
 
-        else:
-            logger.error(f'Could not find any emotes in 7tv!')
-            await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
-                                                    f"Please check if the link you sent is correct and try again.",
-                                                    ephemeral=True)
+            else:
+                logger.error(f'Could not find any emotes in 7tv!')
+                await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
+                                                        f"Please check if the link you sent is correct and try again.",
+                                                        ephemeral=True)
 
 
 async def setup(bot):
