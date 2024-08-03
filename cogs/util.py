@@ -126,8 +126,6 @@ class Util(commands.Cog):
         data = await get7tvEmoteList(emote_set)
         emotes7tv_animated = []
         emotes7tv_non_animated = []
-        emotes7tvID = []
-        emotes7tv_name = []
 
         animatedID = []
         non_animatedID = []
@@ -141,17 +139,10 @@ class Util(commands.Cog):
                 animated = emote['data']['animated']
                 url_parts = emote['data']['host']['url'].split('/')
                 last_part = url_parts[-1]
-                emotes7tv_name.append(emote['name'])
-                emotes7tvID.append(last_part)
                 if animated:
                     emotes7tv_animated.append(emote['name'])
                 else:
                     emotes7tv_non_animated.append(emote['name'])
-
-            print(emotes7tv_animated)
-            print(emotes7tv_non_animated)
-            print(animatedID)
-            print(non_animatedID)
 
             guild_parse = f"{guild_emotes}"
             animated_emotes, non_animated_emotes = await parseGuildEmotes(guild_parse)
@@ -160,50 +151,37 @@ class Util(commands.Cog):
 
             if len(emotes7tv_animated) < animated_free and len(emotes7tv_non_animated) < non_animated_free:
                 logger.info(f"{animated_free} animated slots and {non_animated_free} non animated slots available for import, continuing...")
-                print(emotes7tvID, len(emotes7tvID))
-                print(emotes7tv_name, len(emotes7tv_name))
-                print(len(animatedID), len(non_animatedID))
                 counter_non_animated = 0
                 counter_animated = 0
                 await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available! Attempting to add all emojis, please wait...', ephemeral=True)
                 for emote_id, emote_name in zip(non_animatedID, emotes7tv_non_animated):
                     downloaded = await download7tvEmoteNonAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
-                    print(emotebytes)
 
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
                         if sys.getsizeof(emote_compressed) > 250000:
-                            print('too big')
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
                             counter_non_animated += 1
                     else:
                         await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
 
-                print(counter_non_animated)
-
                 if counter_non_animated >= 0:
                     await interaction.edit_original_response(content=f'Successfully added all non animated emotes!')
                 else:
                     await interaction.edit_original_response(content=f"Can't add all animated emotes!")
-
                 for emote_id, emote_name in zip(animatedID, emotes7tv_animated):
                     downloaded = await download7tvEmoteAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
-                    print(emotebytes)
-                    # print(downloaded)
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
                         if sys.getsizeof(emote_compressed) > 250000:
-                            print('too big')
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
                             counter_animated += 1
                     else:
                         await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
-
-                print(counter_animated)
 
                 if counter_animated >= 0:
                     await interaction.edit_original_response(content=f'Successfully added all animated emotes!')
