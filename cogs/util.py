@@ -126,6 +126,8 @@ class Util(commands.Cog):
         data = await get7tvEmoteList(emote_set)
         emotes7tv_animated = []
         emotes7tv_non_animated = []
+        skipped_anim_emotes = []
+        skipped_non_anim_emotes = []
 
         animatedID = []
         non_animatedID = []
@@ -161,32 +163,38 @@ class Util(commands.Cog):
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
                         if sys.getsizeof(emote_compressed) > 250000:
+                            logger.warning(f"Emote {emote_name} too big! Size is {sys.getsizeof(emote_compressed)}. Skipping emote...")
+                            counter_non_animated += 1
+                            skipped_non_anim_emotes.append(emote_name)
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
-                            counter_non_animated += 1
                     else:
                         await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
 
-                if counter_non_animated >= 0:
-                    await interaction.edit_original_response(content=f'Successfully added all non animated emotes!')
-                else:
-                    await interaction.edit_original_response(content=f"Can't add all animated emotes!")
                 for emote_id, emote_name in zip(animatedID, emotes7tv_animated):
                     downloaded = await download7tvEmoteAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
                         if sys.getsizeof(emote_compressed) > 250000:
+                            logger.warning(f"Emote {emote_name} too big! Size is {sys.getsizeof(emote_compressed)}. Skipping emote...")
+                            counter_animated += 1
+                            skipped_anim_emotes.append(emote_name)
                         else:
                             await interaction.guild.create_custom_emoji(name=emote_name, image=emote_compressed, reason=None)
-                            counter_animated += 1
                     else:
                         await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
 
-                if counter_animated >= 0:
+                if counter_animated == 0 and counter_non_animated == 0:
                     await interaction.edit_original_response(content=f'Successfully added all animated emotes!')
-                else:
-                    await interaction.edit_original_response(content=f"Can't add all animated emotes!")
+                elif counter_animated >= 1 and counter_non_animated == 0:
+                    await interaction.edit_original_response(content=f"Successfully added all non animated emotes!"
+                                                                     f"Can't add all animated emotes!")
+                elif counter_animated == 0 and counter_non_animated >= 1:
+                    await interaction.edit_original_response(content=f"Successfully added all animated emotes!"
+                                                                     f"Can't add all non animated emotes!")
+                elif counter_animated >= 1 and counter_non_animated >= 1:
+                    await interaction.edit_original_response(content=f"Can't add all emotes!")
 
             elif len(emotes7tv_animated) > animated_free:
                 logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
