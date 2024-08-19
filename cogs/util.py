@@ -8,7 +8,7 @@ import json
 import re
 import aiofiles
 import sys
-from discord import app_commands
+from discord import app_commands, RateLimited
 from discord.ext import commands, tasks
 from math import floor
 from utils.util7tv import get7tvEmoteList, download7tvEmoteAnimated, download7tvEmoteNonAnimated, parseGuildEmotes, compress7tvEmote
@@ -18,6 +18,26 @@ logger = logging.getLogger('__name__')
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s:%(levelname)s:%(filename)s: %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
+
+
+async def emojiResponse(counter_animated, counter_non_animated, skipped_anim, skipped_non_anim):
+    response = ""
+    skipped_anim_list = '\n'.join(skipped_anim)
+    skipped_non_anim_list = '\n'.join(skipped_non_anim)
+    if counter_animated == 0 and counter_non_animated == 0:
+        response = "Successfully added all animated emotes!"
+    elif counter_animated >= 1 and counter_non_animated == 0:
+        response = (f"Successfully added all non animated emotes!\n"
+                    f"Can't add all animated emotes! Here's a list:\n\n{skipped_anim_list}")
+    elif counter_animated == 0 and counter_non_animated >= 1:
+        response = (f"Successfully added all animated emotes!\n"
+                    f"Can't add all non animated emotes! Here's a list:\n\n{skipped_non_anim_list}")
+    elif counter_animated >= 1 and counter_non_animated >= 1:
+        response = (f"Can't add all emotes!\n"
+                    f"Names of emotes that did not get added:\n\n ### Animated:\n{skipped_anim_list}\n\n ### Non-Animated:\n{skipped_non_anim}")
+
+    logger.info(f"Dmed with {response}")
+    return response
 
 
 class Util(commands.Cog):
@@ -119,6 +139,7 @@ class Util(commands.Cog):
     @role_required("Mods")
     @app_commands.default_permissions(ban_members=True)
     async def import7tv(self, interaction: discord.Interaction, emote_set: str):
+
         logger.info(f'Attempting to import {emote_set} from 7tv!')
         emote_limit = interaction.guild.emoji_limit
         guild_emotes = interaction.guild.emojis
@@ -139,8 +160,6 @@ class Util(commands.Cog):
                     non_animatedID.append(emote['id'])
 
                 animated = emote['data']['animated']
-                url_parts = emote['data']['host']['url'].split('/')
-                last_part = url_parts[-1]
                 if animated:
                     emotes7tv_animated.append(emote['name'])
                 else:
@@ -155,10 +174,19 @@ class Util(commands.Cog):
                 logger.info(f"{animated_free} animated slots and {non_animated_free} non animated slots available for import, continuing...")
                 counter_non_animated = 0
                 counter_animated = 0
+                ratelimited = 0
                 await interaction.response.send_message(f'{animated_free} animated slots and {non_animated_free} non animated slots available! Attempting to add all emojis, please wait...', ephemeral=True)
                 for emote_id, emote_name in zip(non_animatedID, emotes7tv_non_animated):
                     downloaded = await download7tvEmoteNonAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
+
+                    if RateLimited:  # This if statement is disgusting, I'm so sorry
+                        if ratelimited >= 1:
+                            pass
+                        else:
+                            await interaction.edit_original_response(content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
+                                                                             "If you have dms closed, I'll ping you in this channel once everything is done")
+                            ratelimited += 1
 
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
@@ -174,6 +202,15 @@ class Util(commands.Cog):
                 for emote_id, emote_name in zip(animatedID, emotes7tv_animated):
                     downloaded = await download7tvEmoteAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
+
+                    if RateLimited:  # This if statement is also equally disgusting, I'm extremely sorry
+                        if ratelimited >= 1:
+                            pass
+                        else:
+                            await interaction.edit_original_response(content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
+                                                                             "If you have dms closed, I'll ping you in this channel once everything is done")
+                            ratelimited += 1
+
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
                         if sys.getsizeof(emote_compressed) > 250000:
@@ -185,16 +222,10 @@ class Util(commands.Cog):
                     else:
                         await interaction.guild.create_custom_emoji(name=emote_name, image=downloaded, reason=None)
 
-                if counter_animated == 0 and counter_non_animated == 0:
-                    await interaction.edit_original_response(content=f'Successfully added all animated emotes!')
-                elif counter_animated >= 1 and counter_non_animated == 0:
-                    await interaction.edit_original_response(content=f"Successfully added all non animated emotes!"
-                                                                     f"Can't add all animated emotes!")
-                elif counter_animated == 0 and counter_non_animated >= 1:
-                    await interaction.edit_original_response(content=f"Successfully added all animated emotes!"
-                                                                     f"Can't add all non animated emotes!")
-                elif counter_animated >= 1 and counter_non_animated >= 1:
-                    await interaction.edit_original_response(content=f"Can't add all emotes!")
+                if ratelimited >= 1:
+                    await interaction.user.send(f"{await emojiResponse(counter_animated, counter_non_animated, skipped_anim_emotes, skipped_non_anim_emotes)}")
+                else:
+                    await interaction.edit_original_response(content=f"{await emojiResponse(counter_animated, counter_non_animated, skipped_anim_emotes, skipped_non_anim_emotes)}")
 
             elif len(emotes7tv_animated) > animated_free:
                 logger.error(f"{len(emotes7tv_animated) - animated_free} more emote slots needed!")
