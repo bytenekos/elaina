@@ -179,14 +179,11 @@ class Util(commands.Cog):
                 for emote_id, emote_name in zip(non_animatedID, emotes7tv_non_animated):
                     downloaded = await download7tvEmoteNonAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
-
-                    if RateLimited:  # This if statement is disgusting, I'm so sorry
-                        if ratelimited >= 1:
-                            pass
-                        else:
-                            await interaction.edit_original_response(content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
-                                                                             "If you have dms closed, I'll ping you in this channel once everything is done")
-                            ratelimited += 1
+                    if RateLimited:
+                        await interaction.edit_original_response(
+                            content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
+                                    "If you have dms closed, I'll ping you in this channel once everything is done")
+                        ratelimited += 1
 
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
@@ -202,14 +199,11 @@ class Util(commands.Cog):
                 for emote_id, emote_name in zip(animatedID, emotes7tv_animated):
                     downloaded = await download7tvEmoteAnimated(emote_id, emote_name)
                     emotebytes = sys.getsizeof(downloaded)
-
-                    if RateLimited:  # This if statement is also equally disgusting, I'm extremely sorry
-                        if ratelimited >= 1:
-                            pass
-                        else:
-                            await interaction.edit_original_response(content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
-                                                                             "If you have dms closed, I'll ping you in this channel once everything is done")
-                            ratelimited += 1
+                    if RateLimited:
+                        await interaction.edit_original_response(
+                            content="I'm getting ratelimited! I'll try to send you a dm once the command is done."
+                                    "If you have dms closed, I'll ping you in this channel once everything is done")
+                        ratelimited += 1
 
                     if emotebytes > 250000:
                         emote_compressed = await compress7tvEmote(downloaded, emote_name)
@@ -240,8 +234,7 @@ class Util(commands.Cog):
             else:
                 logger.error(f'Could not find any emotes in 7tv!')
                 await interaction.response.send_message(f"Couldn't find the emotes in 7tv!"
-                                                        f"Please check if the link you sent is correct and try again.",
-                                                        ephemeral=True)
+                                                        f"Please check if the link you sent is correct and try again.", ephemeral=True)
 
 
 async def setup(bot):
