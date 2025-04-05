@@ -1,4 +1,5 @@
 import asyncio
+import aiosqlite
 import discord
 import os
 import logging
@@ -60,11 +61,15 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 intents.messages = True
-bot = commands.Bot(command_prefix='!',
-                   intents=intents,
-                   application_id='991731064026448043',
-                   guilds=[discord.Object(id=1116469018019233812)])
+class Bot(commands.Bot):
+    db: aiosqlite.Connection
+    async def setup_hook(self):
+        self.db = await aiosqlite.connect('testing.db')
 
+bot = Bot(command_prefix='!',
+          intents=intents,
+          application_id='991731064026448043',
+          guilds=[discord.Object(id=1116469018019233812)])
 
 @bot.event
 async def on_ready():

@@ -19,6 +19,9 @@ class Welcome(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         logger.info(f'Member joined: {member}')
+        await self.bot.db.execute('INSERT INTO Users VALUES (289451427011756032, 1743819613, 959811613, 10)')
+        await self.bot.db.commit()
+        print(await self.bot.db.fetchall())
 
 
 async def setup(bot):
