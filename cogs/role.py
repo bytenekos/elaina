@@ -113,4 +113,4 @@ class Role(commands.Cog):
 async def setup(bot):
     bot.add_view(VerifyButton())
     bot.add_view(Dropdown())
-    await bot.add_cog(Role(bot), guilds=[discord.Object(id=1116469018019233812)])
+    await bot.add_cog(Role(bot), guilds=[discord.Object(id=1369464877210406942)])

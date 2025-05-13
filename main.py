@@ -42,8 +42,9 @@ print(r"        \::/    /                \::/    /        \::/    /             
 print(r"         \/____/                  \/____/          \/____/                  \/____/                  \/____/                  \/____/                 ")
 
 
+GUILD_ID = 1369464877210406942
 TOKEN = os.getenv('DISCORD_TOKEN')
-MY_GUILD = discord.Object(id=1116469018019233812)
+MY_GUILD = discord.Object(id=GUILD_ID)
 loadedCogs = []
 log_folder = 'logs'
 os.makedirs(log_folder, exist_ok=True)
@@ -63,7 +64,7 @@ intents.messages = True
 bot = commands.Bot(command_prefix='!',
                    intents=intents,
                    application_id='991731064026448043',
-                   guilds=[discord.Object(id=1116469018019233812)])
+                   guilds=[discord.Object(id=GUILD_ID)])
 
 
 @bot.event

@@ -22,4 +22,4 @@ class Welcome(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Welcome(bot), guilds=[discord.Object(id=1116469018019233812)])
+    await bot.add_cog(Welcome(bot), guilds=[discord.Object(id=1369464877210406942)])

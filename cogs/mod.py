@@ -30,8 +30,8 @@ class Mod(commands.Cog):
         embed.add_field(name="Performed by", value=f"<@!{interaction.user.id}>")
         embed.add_field(name="Reason", value=reason)
 
-        myguild = self.bot.get_guild(1116469018019233812)
-        modlog = myguild.get_channel(1178849788440092683)
+        myguild = self.bot.get_guild(1369464877210406942)
+        modlog = myguild.get_channel(1371359916530601984)
         await modlog.send(embed=embed)
 
         await interaction.response.send_message(f"Done! Banned {member}", ephemeral=True)
@@ -55,8 +55,8 @@ class Mod(commands.Cog):
         embed.add_field(name="Performed by", value=f"<@!{interaction.user.id}>")
         embed.add_field(name="Reason", value=reason)
 
-        myguild = self.bot.get_guild(1116469018019233812)
-        modlog = myguild.get_channel(1178849788440092683)
+        myguild = self.bot.get_guild(1369464877210406942)
+        modlog = myguild.get_channel(1371359916530601984)
         await modlog.send(embed=embed)
 
         await interaction.response.send_message(f"Done! Kicked {member}", ephemeral=True)
@@ -84,4 +84,4 @@ class Mod(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(Mod(bot), guilds=[discord.Object(id=1116469018019233812)])
+    await bot.add_cog(Mod(bot), guilds=[discord.Object(id=1369464877210406942)])
